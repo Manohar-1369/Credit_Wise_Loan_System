@@ -36,30 +36,27 @@ model, scaler, ohe = load_models()
 st.success("✅ Model loaded successfully!")
 
 categorical_cols = ["Employment_Status", "Marital_Status", "Loan_Purpose", "Property_Area", "Gender", "Employer_Category"]
-numeric_features = [
+# EXACT feature order from training (scaler.feature_names_in_)
+feature_columns = [
     "Applicant_Income",
     "Coapplicant_Income",
     "Age",
     "Dependents",
-    "Credit_Score",
     "Existing_Loans",
-    "DTI_Ratio",
     "Savings",
     "Collateral_Value",
     "Loan_Amount",
     "Loan_Term",
     "Education_Level",
-]
-# OHE features in exact order from training
-ohe_features_expected = [
     'Employment_Status_Salaried', 'Employment_Status_Self-employed', 'Employment_Status_Unemployed',
     'Marital_Status_Single',
     'Loan_Purpose_Car', 'Loan_Purpose_Education', 'Loan_Purpose_Home', 'Loan_Purpose_Personal',
     'Property_Area_Semiurban', 'Property_Area_Urban',
     'Gender_Male',
-    'Employer_Category_Government', 'Employer_Category_MNC', 'Employer_Category_Private', 'Employer_Category_Unemployed'
+    'Employer_Category_Government', 'Employer_Category_MNC', 'Employer_Category_Private', 'Employer_Category_Unemployed',
+    'DTI_Ratio_sq',
+    'Credit_Score_sq'
 ]
-feature_columns = numeric_features + ohe_features_expected
 
 # Customer-facing interface (only prediction)
 st.subheader("Predict Loan Approval")
@@ -114,15 +111,17 @@ st.markdown("---")
 if st.button("🔮 Predict Loan Approval", use_container_width=True):
     # Map education level to numeric (0=Graduate, 1=Not Graduate - LabelEncoder alphabetical order)
     edu_encoded = 0 if education_level == "Graduate" else 1
+    
+    # Compute squared features as training used them
+    dti_sq = dti_ratio_value ** 2
+    credit_sq = credit_score ** 2
 
     input_data = pd.DataFrame({
         'Applicant_Income': [applicant_income],
         'Coapplicant_Income': [coapplicant_income],
         'Age': [age],
         'Dependents': [dependents],
-        'Credit_Score': [credit_score],
         'Existing_Loans': [existing_loans],
-        'DTI_Ratio': [dti_ratio_value],
         'Savings': [savings],
         'Collateral_Value': [collateral_value],
         'Loan_Amount': [loan_amount],
@@ -141,6 +140,10 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
     
     encoded_cat = ohe.transform(cat_data)
     encoded_cat_df = pd.DataFrame(encoded_cat, columns=ohe.get_feature_names_out(categorical_cols))
+    
+    # Add squared features
+    encoded_cat_df['DTI_Ratio_sq'] = dti_sq
+    encoded_cat_df['Credit_Score_sq'] = credit_sq
     
     input_df = pd.concat([input_data, encoded_cat_df], axis=1)
     
