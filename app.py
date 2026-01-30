@@ -105,10 +105,11 @@ with col2:
     
     collateral_value = st.number_input("Collateral Value", value=50000, step=5000, min_value=0)
     
-    # Auto-calculate DTI from loan amount and total income
+    # Auto-calculate DTI from monthly loan payment and total monthly income
+    monthly_payment = loan_amount / loan_term if loan_term > 0 else 0
     total_income = applicant_income + coapplicant_income
     if total_income > 0:
-        dti_ratio_value = loan_amount / total_income
+        dti_ratio_value = monthly_payment / total_income
         dti_ratio_value = min(dti_ratio_value, 1.0)  # Cap at 1.0 for modeling
     else:
         dti_ratio_value = 0.0
