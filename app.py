@@ -148,22 +148,20 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
     
     input_df = input_df[feature_columns]
     
-    # DEBUG: Show feature count
-    st.write(f"DEBUG: Input features: {input_df.shape[1]}")
-    st.write(f"DEBUG: Feature columns: {feature_columns}")
-    st.write(f"DEBUG: Input columns: {list(input_df.columns)}")
-    
-    # Convert to numpy array and disable sklearn's feature validation
+    # Convert to numpy array
     input_array = input_df.values
     
-    # Try to scale with validation disabled
+    # Try to scale with sklearn context
     import sklearn
     with sklearn.config_context(assume_finite=True):
         try:
             input_scaled = scaler.transform(input_array)
         except ValueError:
-            # If still fails, manually scale using scaler's mean and scale
-            input_scaled = (input_array - scaler.mean_) / (scaler.scale_ + 1e-8)
+            # Scaler expects different number of features - try trimming to match
+            st.warning(f"Feature count mismatch: got {input_array.shape[1]} features, scaler expects {scaler.n_features_in_}")
+            # Take only first n_features_in_ columns
+            input_array_trimmed = input_array[:, :scaler.n_features_in_]
+            input_scaled = (input_array_trimmed - scaler.mean_) / (scaler.scale_ + 1e-8)
     
     # Use Logistic Regression model prediction with calibration
     decision_score = model.decision_function(input_scaled)[0]
