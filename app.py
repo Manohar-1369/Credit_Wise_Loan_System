@@ -78,7 +78,7 @@ with col2:
         step=0.01,
         help="Debt-to-income ratio as a fraction (e.g., 0.35 = 35%)."
     )
-    education_level = st.selectbox("Education Level", ["Graduate", "Not Graduate"])
+    education_level = st.selectbox("Education Level", ["Not Graduate", "Graduate"])
     employment_status = st.selectbox("Employment Status", ["Salaried", "Self-employed", "Unemployed", "Contract"])
 
 col3, col4, col5 = st.columns(3)
@@ -138,7 +138,8 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
             input_df[col] = 0
     
     input_df = input_df[feature_columns]
-    input_scaled = scaler.transform(input_df)
+    # Convert to numpy array to avoid feature name validation issues
+    input_scaled = scaler.transform(input_df.values)
     
     # Use Logistic Regression model prediction with calibration
     decision_score = model.decision_function(input_scaled)[0]
