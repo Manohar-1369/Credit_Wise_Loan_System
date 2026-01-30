@@ -83,7 +83,6 @@ with col1:
     dependents = st.number_input("Number of Dependents", value=0, step=1, min_value=0)
     credit_score = st.number_input("Credit Score", value=700, step=10)
     savings = st.number_input("Savings", value=25000, step=1000)
-    existing_loans = st.number_input("Existing Loans", value=0, step=1, min_value=0)
 
 with col2:
     st.markdown("### Loan Details")
@@ -149,7 +148,7 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
         'Coapplicant_Income': [coapplicant_income],
         'Age': [age],
         'Dependents': [dependents],
-        'Existing_Loans': [existing_loans],
+        'Existing_Loans': [0],  # Set to 0 (model has backwards relationship with this feature)
         'Savings': [savings],
         'Collateral_Value': [collateral_value],
         'Loan_Amount': [loan_amount],
@@ -179,6 +178,7 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
         if col not in input_df.columns:
             input_df[col] = 0
     
+    # Ensure columns are in EXACT order expected by scaler (CRITICAL!)
     input_df = input_df[feature_columns]
     
     # Convert to numpy array
