@@ -50,10 +50,16 @@ numeric_features = [
     "Loan_Term",
     "Education_Level",
 ]
-# First get the OHE features
-ohe_features = list(ohe.get_feature_names_out(categorical_cols))
-# Only use the first 27 features total (12 numeric + 15 OHE)
-feature_columns = numeric_features + ohe_features
+# OHE features in exact order from training
+ohe_features_expected = [
+    'Employment_Status_Salaried', 'Employment_Status_Self-employed', 'Employment_Status_Unemployed',
+    'Marital_Status_Single',
+    'Loan_Purpose_Car', 'Loan_Purpose_Education', 'Loan_Purpose_Home', 'Loan_Purpose_Personal',
+    'Property_Area_Semiurban', 'Property_Area_Urban',
+    'Gender_Male',
+    'Employer_Category_Government', 'Employer_Category_MNC', 'Employer_Category_Private', 'Employer_Category_Unemployed'
+]
+feature_columns = numeric_features + ohe_features_expected
 
 # Customer-facing interface (only prediction)
 st.subheader("Predict Loan Approval")
