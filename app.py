@@ -95,9 +95,9 @@ with col7:
 st.markdown("---")
 
 if st.button("🔮 Predict Loan Approval", use_container_width=True):
-    # Map education level to numeric (matches LabelEncoder alphabetical order: Graduate=0, Not Graduate=1)
+    # Map education level to numeric (0=Graduate, 1=Not Graduate - LabelEncoder alphabetical order)
     edu_encoded = 0 if education_level == "Graduate" else 1
-
+    
     dti_sq = dti_ratio_value ** 2
     credit_score_sq = credit_score ** 2
 
