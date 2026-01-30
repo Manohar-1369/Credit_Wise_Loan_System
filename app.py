@@ -200,12 +200,6 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
     approval_prob = 1 / (1 + np.exp(-decision_score))
     prediction = 1 if approval_prob >= threshold else 0
     
-    # DEBUG
-    st.write(f"Decision Score: {decision_score:.4f}")
-    st.write(f"Approval Probability (raw): {approval_prob:.4f}")
-    st.write(f"Threshold: {threshold}")
-    st.write(f"Prediction: {'APPROVED' if prediction == 1 else 'REJECTED'}")
-    
     st.markdown("---")
     st.markdown("### 📊 Prediction Results")
     
