@@ -43,7 +43,9 @@ numeric_features = [
     "Loan_Amount",
     "Savings",
     "Education_Level",
+    "DTI_Ratio",
     "DTI_Ratio_sq",
+    "Credit_Score",
     "Credit_Score_sq",
 ]
 feature_columns = numeric_features + list(ohe.get_feature_names_out(categorical_cols))
@@ -108,7 +110,9 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
         'Loan_Amount': [loan_amount],
         'Savings': [savings],
         'Education_Level': [edu_encoded],
+        'DTI_Ratio': [dti_ratio_value],
         'DTI_Ratio_sq': [dti_sq],
+        'Credit_Score': [credit_score],
         'Credit_Score_sq': [credit_score_sq]
     })
     
