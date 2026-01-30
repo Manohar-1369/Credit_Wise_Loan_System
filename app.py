@@ -64,6 +64,15 @@ st.subheader("Predict Loan Approval")
 # Fixed threshold (bank policy - not customer controlled)
 threshold = 0.50  # 50% threshold
 
+# Define default loan terms by purpose
+loan_term_defaults = {
+    "Personal": (60, 120),      # (default, max)
+    "Car": (72, 84),
+    "Home": (360, 480),
+    "Business": (180, 300),
+    "Education": (120, 240)
+}
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -79,7 +88,21 @@ with col1:
 with col2:
     st.markdown("### Loan Details")
     loan_amount = st.number_input("Loan Amount", value=100000, step=5000)
-    loan_term = st.number_input("Loan Term (months)", value=360, step=12, min_value=1)
+    
+    # Loan purpose first (needed to determine loan term)
+    loan_purpose = st.selectbox("Loan Purpose", ["Personal", "Car", "Home", "Business", "Education"])
+    default_term, max_term = loan_term_defaults[loan_purpose]
+    
+    # Dynamic loan term based on purpose
+    loan_term = st.number_input(
+        "Loan Term (months)", 
+        value=default_term, 
+        step=12, 
+        min_value=1, 
+        max_value=max_term,
+        help=f"Typical range for {loan_purpose} loans: up to {max_term} months"
+    )
+    
     collateral_value = st.number_input("Collateral Value", value=50000, step=5000, min_value=0)
     dti_ratio_value = st.number_input(
         "DTI Ratio (0 to 1)",
@@ -96,15 +119,15 @@ col3, col4, col5 = st.columns(3)
 with col3:
     marital_status = st.selectbox("Marital Status", ["Single", "Married"])
 with col4:
-    loan_purpose = st.selectbox("Loan Purpose", ["Personal", "Car", "Home", "Business", "Education"])
-with col5:
     property_area = st.selectbox("Property Area", ["Urban", "Semiurban", "Rural"])
+with col5:
+    gender = st.selectbox("Gender", ["Female", "Male"])
 
 col6, col7 = st.columns(2)
 with col6:
-    gender = st.selectbox("Gender", ["Female", "Male"])
-with col7:
     employer_category = st.selectbox("Employer Category", ["Private", "Government", "MNC", "Unemployed", "Business"])
+with col7:
+    pass  # Empty column for layout balance
 
 st.markdown("---")
 
