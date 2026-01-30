@@ -29,13 +29,10 @@ def load_models():
     with open('onehot_encoder.pkl', 'rb') as f:
         ohe = pickle.load(f)
     
-    with open('label_encoders.pkl', 'rb') as f:
-        encoders = pickle.load(f)
     
-    return model, scaler, ohe, encoders
+    return model, scaler, ohe
 
-model, scaler, ohe, encoders = load_models()
-le_edu = encoders['education']
+model, scaler, ohe = load_models()
 st.success("✅ Model loaded successfully!")
 
 categorical_cols = ["Employment_Status", "Marital_Status", "Loan_Purpose", "Property_Area", "Gender", "Employer_Category"]
@@ -98,12 +95,8 @@ with col7:
 st.markdown("---")
 
 if st.button("🔮 Predict Loan Approval", use_container_width=True):
-    try:
-        edu_encoded = le_edu.transform([education_level])[0]
-    except ValueError:
-        # If label not found, use a default encoding (0 for first class)
-        st.error(f"Education level '{education_level}' not recognized. Using default value.")
-        edu_encoded = 0
+    # Map education level to numeric (matches LabelEncoder alphabetical order: Graduate=0, Not Graduate=1)
+    edu_encoded = 0 if education_level == "Graduate" else 1
 
     dti_sq = dti_ratio_value ** 2
     credit_score_sq = credit_score ** 2
