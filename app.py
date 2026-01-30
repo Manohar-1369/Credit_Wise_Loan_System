@@ -104,14 +104,18 @@ with col2:
     )
     
     collateral_value = st.number_input("Collateral Value", value=50000, step=5000, min_value=0)
-    dti_ratio_value = st.number_input(
-        "DTI Ratio (0 to 1)",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.35,
-        step=0.01,
-        help="Debt-to-income ratio as a fraction (e.g., 0.35 = 35%)."
-    )
+    
+    # Auto-calculate DTI from loan amount and total income
+    total_income = applicant_income + coapplicant_income
+    if total_income > 0:
+        dti_ratio_value = loan_amount / total_income
+        dti_ratio_value = min(dti_ratio_value, 1.0)  # Cap at 1.0 for modeling
+    else:
+        dti_ratio_value = 0.0
+    
+    # Display calculated DTI
+    st.metric("Calculated DTI Ratio", f"{dti_ratio_value:.2%}")
+    
     education_level = st.selectbox("Education Level", ["Not Graduate", "Graduate"])
     employment_status = st.selectbox("Employment Status", ["Salaried", "Self-employed", "Unemployed", "Contract"])
 
