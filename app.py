@@ -49,10 +49,11 @@ numeric_features = [
     "Loan_Amount",
     "Loan_Term",
     "Education_Level",
-    "DTI_Ratio_sq",
-    "Credit_Score_sq",
 ]
-feature_columns = numeric_features + list(ohe.get_feature_names_out(categorical_cols))
+# First get the OHE features
+ohe_features = list(ohe.get_feature_names_out(categorical_cols))
+# Only use the first 27 features total (12 numeric + 15 OHE)
+feature_columns = numeric_features + ohe_features
 
 # Customer-facing interface (only prediction)
 st.subheader("Predict Loan Approval")
@@ -107,9 +108,6 @@ st.markdown("---")
 if st.button("🔮 Predict Loan Approval", use_container_width=True):
     # Map education level to numeric (0=Graduate, 1=Not Graduate - LabelEncoder alphabetical order)
     edu_encoded = 0 if education_level == "Graduate" else 1
-    
-    dti_sq = dti_ratio_value ** 2
-    credit_score_sq = credit_score ** 2
 
     input_data = pd.DataFrame({
         'Applicant_Income': [applicant_income],
@@ -124,8 +122,6 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
         'Loan_Amount': [loan_amount],
         'Loan_Term': [loan_term],
         'Education_Level': [edu_encoded],
-        'DTI_Ratio_sq': [dti_sq],
-        'Credit_Score_sq': [credit_score_sq]
     })
     
     cat_data = pd.DataFrame({
@@ -151,17 +147,14 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
     # Convert to numpy array
     input_array = input_df.values
     
-    # Try to scale with sklearn context
+    # Scale the features
     import sklearn
     with sklearn.config_context(assume_finite=True):
         try:
             input_scaled = scaler.transform(input_array)
-        except ValueError:
-            # Scaler expects different number of features - try trimming to match
-            st.warning(f"Feature count mismatch: got {input_array.shape[1]} features, scaler expects {scaler.n_features_in_}")
-            # Take only first n_features_in_ columns
-            input_array_trimmed = input_array[:, :scaler.n_features_in_]
-            input_scaled = (input_array_trimmed - scaler.mean_) / (scaler.scale_ + 1e-8)
+        except ValueError as e:
+            st.error(f"Scaling error: {str(e)}")
+            st.stop()
     
     # Use Logistic Regression model prediction with calibration
     decision_score = model.decision_function(input_scaled)[0]
