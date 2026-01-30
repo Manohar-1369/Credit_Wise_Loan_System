@@ -37,15 +37,19 @@ st.success("✅ Model loaded successfully!")
 
 categorical_cols = ["Employment_Status", "Marital_Status", "Loan_Purpose", "Property_Area", "Gender", "Employer_Category"]
 numeric_features = [
-    "Age",
     "Applicant_Income",
     "Coapplicant_Income",
-    "Loan_Amount",
-    "Savings",
-    "Education_Level",
-    "DTI_Ratio",
-    "DTI_Ratio_sq",
+    "Age",
+    "Dependents",
     "Credit_Score",
+    "Existing_Loans",
+    "DTI_Ratio",
+    "Savings",
+    "Collateral_Value",
+    "Loan_Amount",
+    "Loan_Term",
+    "Education_Level",
+    "DTI_Ratio_sq",
     "Credit_Score_sq",
 ]
 feature_columns = numeric_features + list(ohe.get_feature_names_out(categorical_cols))
@@ -63,12 +67,16 @@ with col1:
     age = st.number_input("Age", value=35, step=1)
     applicant_income = st.number_input("Applicant Income (Monthly)", value=30000, step=500)
     coapplicant_income = st.number_input("Co-applicant Income (Monthly)", value=20000, step=500)
+    dependents = st.number_input("Number of Dependents", value=0, step=1, min_value=0)
     credit_score = st.number_input("Credit Score", value=700, step=10)
     savings = st.number_input("Savings", value=25000, step=1000)
+    existing_loans = st.number_input("Existing Loans", value=0, step=1, min_value=0)
 
 with col2:
     st.markdown("### Loan Details")
     loan_amount = st.number_input("Loan Amount", value=100000, step=5000)
+    loan_term = st.number_input("Loan Term (months)", value=360, step=12, min_value=1)
+    collateral_value = st.number_input("Collateral Value", value=50000, step=5000, min_value=0)
     dti_ratio_value = st.number_input(
         "DTI Ratio (0 to 1)",
         min_value=0.0,
@@ -104,15 +112,19 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
     credit_score_sq = credit_score ** 2
 
     input_data = pd.DataFrame({
-        'Age': [age],
         'Applicant_Income': [applicant_income],
         'Coapplicant_Income': [coapplicant_income],
-        'Loan_Amount': [loan_amount],
-        'Savings': [savings],
-        'Education_Level': [edu_encoded],
-        'DTI_Ratio': [dti_ratio_value],
-        'DTI_Ratio_sq': [dti_sq],
+        'Age': [age],
+        'Dependents': [dependents],
         'Credit_Score': [credit_score],
+        'Existing_Loans': [existing_loans],
+        'DTI_Ratio': [dti_ratio_value],
+        'Savings': [savings],
+        'Collateral_Value': [collateral_value],
+        'Loan_Amount': [loan_amount],
+        'Loan_Term': [loan_term],
+        'Education_Level': [edu_encoded],
+        'DTI_Ratio_sq': [dti_sq],
         'Credit_Score_sq': [credit_score_sq]
     })
     
