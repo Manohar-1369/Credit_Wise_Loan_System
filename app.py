@@ -98,7 +98,12 @@ with col7:
 st.markdown("---")
 
 if st.button("🔮 Predict Loan Approval", use_container_width=True):
-    edu_encoded = le_edu.transform([education_level])[0]
+    try:
+        edu_encoded = le_edu.transform([education_level])[0]
+    except ValueError:
+        # If label not found, use a default encoding (0 for first class)
+        st.error(f"Education level '{education_level}' not recognized. Using default value.")
+        edu_encoded = 0
 
     dti_sq = dti_ratio_value ** 2
     credit_score_sq = credit_score ** 2
