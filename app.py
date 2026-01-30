@@ -131,6 +131,12 @@ if st.button("🔮 Predict Loan Approval", use_container_width=True):
             input_df[col] = 0
     
     input_df = input_df[feature_columns]
+    
+    # DEBUG: Show feature count
+    st.write(f"DEBUG: Input features: {input_df.shape[1]}")
+    st.write(f"DEBUG: Feature columns: {feature_columns}")
+    st.write(f"DEBUG: Input columns: {list(input_df.columns)}")
+    
     # Convert to numpy array to avoid feature name validation issues
     input_scaled = scaler.transform(input_df.values)
     
